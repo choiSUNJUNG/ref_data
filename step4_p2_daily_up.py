@@ -20,8 +20,8 @@ sheet.append(['time', 'market', 'symbol', 'code', 'company_name', 'prev_price', 
 wb.save('step4_p2_daily_10p_up_'+filename+'.xlsx')
 
 #회사 데이터 읽기
-# df_com = pd.read_excel("step2_300k_day_coms.xlsx")
-df_com = pd.read_excel("step3_3mon_10p_up_2021-07-01.xlsx")
+df_com = pd.read_excel("step2_300k_day_coms.xlsx")
+# df_com = pd.read_excel("step3_3mon_10p_up_2021-07-01.xlsx")
 # while True:
 #     try:
 i = 1
