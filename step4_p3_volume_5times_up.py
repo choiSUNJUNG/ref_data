@@ -21,7 +21,7 @@ wb.save('step4_p3_volume_5times_up_'+filename+'.xlsx')
 
 #회사 데이터 읽기
 # df_com = pd.read_excel("step2_300k_day_coms.xlsx")
-df_com = pd.read_excel("step3_3mon_10p_up_2021-07-01.xlsx")
+df_com = pd.read_excel("step3_3mon_10p_up_2021-07-08.xlsx")
 now = datetime.datetime.now()
 i = 1
 for i in range(len(df_com)):
