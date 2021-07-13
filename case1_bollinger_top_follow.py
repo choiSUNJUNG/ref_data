@@ -6,6 +6,7 @@ from pandas_datareader import data as pdr
 import yfinance as yf
 import pandas as pd
 import matplotlib.pyplot as plt
+import mplfinance as mpf
 import openpyxl
 import datetime
 import time
@@ -18,7 +19,7 @@ filename = datetime.datetime.now().strftime("%Y-%m-%d")
 # wb.save('watch_data.xlsx')
 sheet = wb.active
 # cell name : date, simbol, company name, upper or lower or narrow band 
-sheet.append(['time', 'market', 'symbol', 'code', 'company_name', 'bol_high', 'bol_lower', 'bol_gap(%)', 'rise_margin(%)', 'MA20', 'open', 'close', 'volume', 'industry', 'trade'])
+sheet.append(['time', 'market', 'symbol', 'code', 'company_name', 'bol_high', 'bol_low', 'bol_gap(%)', 'rise_margin(%)', 'monthly_rise(%)', 'MA20', 'open', 'close', 'volume', 'industry', 'trade'])
 wb.save('case1_bollinger_follow_'+filename+'.xlsx')
 
 #회사 데이터 읽기
@@ -27,7 +28,7 @@ df_com = pd.read_excel("step3_3mon_10p_up_2021-07-08.xlsx")
 i = 1
 for i in range(len(df_com)):
     # now = datetime.datetime.now()
-    df = pdr.get_data_yahoo(df_com.iloc[i]['symbol'], period = '30d')
+    df = pdr.get_data_yahoo(df_com.iloc[i]['symbol'], period = '60d')
     try :
         df['MA20'] = df['Close'].rolling(window=20).mean()
         # df['MA60'] = df['Close'].rolling(window=60).mean()
@@ -63,14 +64,36 @@ for i in range(len(df_com)):
 
         if cur_close >= df.iloc[-1]['upper'] * 0.8 and cur_close > cur_open >= df.iloc[-1]['MA20'] and today_gap >= pre_gap * 2 and df.iloc[-1]['Volume'] >= 300000 :
             sheet.append([now, df_com.iloc[i]['market'], df_com.iloc[i]['symbol'], df_com.iloc[i]['code'], df_com.iloc[i]['company_name'], \
-                df.iloc[-1]['upper'], df.iloc[-1]['lower'], df.iloc[-1]['gap'], df.iloc[-1]['rise_margin'], df.iloc[-1]['MA20'], df.iloc[-1]['Open'], \
+                df.iloc[-1]['upper'], df.iloc[-1]['lower'], df.iloc[-1]['gap'], df.iloc[-1]['rise_margin'], df_com.iloc[i]['month_rise(%)'], df.iloc[-1]['MA20'], df.iloc[-1]['Open'], \
                     df.iloc[-1]['Close'], df.iloc[-1]['Volume'], df_com.iloc[i]['industry'],'buy'])
             wb.save('case1_bollinger_follow_'+filename+'.xlsx')
             print('buy', df_com.iloc[i]['symbol'])
-                    
+            plt.figure(figsize=(9, 7))
+            plt.subplot(2, 1, 1)
+            plt.plot(df['upper'], color='green', label='Bollinger upper')
+            plt.plot(df['lower'], color='brown', label='Bollinger lower')
+            plt.plot(df['MA20'], color='black', label='MA20')
+            plt.plot(df['Close'], color='blue', label='Price')
+             
+            plt.title(df_com.iloc[i]['symbol']+'stock price')
+            plt.xlabel('time')
+            plt.xticks(rotation = 45)
+            plt.ylabel('stock price')
+            plt.legend()
+            
+            plt.subplot(2, 1, 2)
+            plt.plot(df['Volume'], color='blue', label='Volume')
+            plt.ylabel('Volume')
+            plt.xlabel('time')
+            plt.xticks(rotation = 45)
+            plt.legend()
+            plt.show() 
+            df = df[['Open', 'High', 'Close', 'Volume']] 
+                  
     except Exception as e:
         print(e)
         print('error', df_com.iloc[i]['symbol'])
+    print(df_com.iloc[i]['symbol'])
     i += 1   
 
 df_1 = pd.read_excel('case1_bollinger_follow_'+filename+'.xlsx') 
@@ -82,3 +105,4 @@ df_b_f.to_excel('case1_bollinger_follow_'+filename+'.xlsx')
     # except Exception as e:
     #     print(e)
     #     time.sleep(0.1)
+
